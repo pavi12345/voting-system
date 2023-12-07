@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    dbName: voting_system
+    dbIP: localhost
+    url: jdbc:mysql://${spring.datasource.dbIP}/${spring.datasource.dbName}?createDatabaseIfNotExist=true
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    entityEventListenerEnabled: true
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+      format_sql: true
+      globally_quoted_identifiers: true
+    show-sql: true
