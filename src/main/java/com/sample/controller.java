@@ -37,13 +37,19 @@ public class controller
 
         logger.info("Saved candidate = {}",savedCandidate);
 
-        return new ResponseEntity<>(savedCandidate, (savedCandidate!=null ? HttpStatus.CREATED : HttpStatus.UNPROCESSABLE_ENTITY));
+        return new ResponseEntity<>(savedCandidate, HttpStatus.CREATED);
     }
 
     @PostMapping("/castVote")
     public ResponseEntity<Candidate> castVote(@RequestParam ("name") String name)
     {
         Candidate candidate = votingRepository.findByName(name);
+
+        if(candidate == null)
+        {
+            logger.info("No candidate found for given name = {}",name);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
         int vote = candidate.getVote();
 
@@ -53,7 +59,7 @@ public class controller
 
         Candidate updatedCandidate = votingRepository.save(candidate);
 
-        return new ResponseEntity<>(updatedCandidate,(updatedCandidate!=null ? HttpStatus.ACCEPTED : HttpStatus.NO_CONTENT));
+        return new ResponseEntity<>(updatedCandidate, HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/countVote")
@@ -61,11 +67,17 @@ public class controller
     {
         Candidate candidate = votingRepository.findByName(name);
 
+        if(candidate == null)
+        {
+            logger.info("No candidate found for given name = {}",name);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         int count = candidate.getVote();
 
         logger.info("For name = {}, count = {}",name,count);
 
-        return new ResponseEntity<>(count,(candidate!=null ? HttpStatus.OK : HttpStatus.NO_CONTENT));
+        return new ResponseEntity<>(count, HttpStatus.OK);
     }
 
     @GetMapping("/listVote")
@@ -73,15 +85,27 @@ public class controller
     {
         List<Candidate> candidateList = votingRepository.findAll();
 
+        if(candidateList.isEmpty())
+        {
+            logger.info("Obtained candidate details from DB is empty = {}",candidateList);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
         logger.info("All candidates name vs vote ={}",candidateList);
 
-        return new ResponseEntity<>(candidateList,(candidateList!=null ? HttpStatus.OK: HttpStatus.NO_CONTENT));
+        return new ResponseEntity<>(candidateList, HttpStatus.OK);
     }
 
     @GetMapping("/getWinner")
     public ResponseEntity<String> getWinner()
     {
         List<Candidate> candidateList = votingRepository.findAll();
+
+        if(candidateList.isEmpty())
+        {
+            logger.info("Obtained candidate details from DB is empty = {}",candidateList);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
 
         Map<String,Integer> map = new HashMap<>();
 
